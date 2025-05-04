@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Candle Label Mockup Generator</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #f8f8f8;
+      text-align: center;
+    }
+    #preview {
+      margin-top: 2rem;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    input[type="text"] {
+      width: 300px;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+    }
+    button {
+      padding: 0.6rem 1.2rem;
+      background: black;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Candle Label Mockup Generator</h1>
+
+  <p>Paste your label image public ID (from Cloudinary):</p>
+  <input type="text" id="labelInput" placeholder="e.g., WC._Glass_Labels_12_yleqzw" />
+
+  <p>Optional: Adjust label width (default 600):</p>
+  <input type="text" id="widthInput" placeholder="600" />
+
+  <p>Optional: Adjust label Y position (default 40):</p>
+  <input type="text" id="yInput" placeholder="40" />
+
+  <br />
+  <button onclick="generateMockup()">Generate Mockup</button>
+
+  <div id="preview"></div>
+
+  <script>
+    const cloudName = "dxvvsayvg"; // your Cloudinary cloud name
+    const baseImage = "WC._Glass_Listing_Images_n5u37p"; // your base candle image
+
+    function generateMockup() {
+      const labelId = document.getElementById("labelInput").value;
+      const width = document.getElementById("widthInput").value || 600;
+      const y = document.getElementById("yInput").value || 40;
+
+      if (!labelId) {
+        alert("Please enter a label public ID");
+        return;
+      }
+
+      const url = `https://res.cloudinary.com/${cloudName}/image/upload/l_${labelId},w_${width},x_0,y_${y}/${baseImage}.png`;
+      document.getElementById("preview").innerHTML = `<h2>Preview:</h2><img src="${url}" alt="Mockup" />`;
+    }
+  </script>
+</body>
+</html>
