@@ -44,6 +44,10 @@
       width: 100%;
       border-radius: 8px;
     }
+    .error {
+      color: red;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
@@ -107,16 +111,30 @@
       gallery.innerHTML = "";
 
       baseImages.forEach((baseId) => {
-        const url = `https://res.cloudinary.com/${cloudName}/image/upload/l_${labelId},w_${width},x_0,y_${y}/${baseId}.png`;
-        const card = document.createElement("div");
-        card.className = "mockup-card";
-        card.innerHTML = `
-          <img src="${url}" alt="Mockup" />
-          <a href="${url}" download="${baseId}-mockup.png">
-            <button>Download</button>
-          </a>
-        `;
-        gallery.appendChild(card);
+        const formats = [".png", ".jpg", ".jpeg", ""];
+        let found = false;
+        formats.forEach(ext => {
+          if (!found) {
+            const url = `https://res.cloudinary.com/${cloudName}/image/upload/l_${labelId},w_${width},x_0,y_${y}/${baseId}${ext}`;
+            const img = new Image();
+            img.src = url;
+            img.onload = () => {
+              if (!found) {
+                found = true;
+                const card = document.createElement("div");
+                card.className = "mockup-card";
+                card.innerHTML = `
+                  <img src="${url}" alt="Mockup" />
+                  <a href="${url}" download="${baseId}-mockup.png">
+                    <button>Download</button>
+                  </a>
+                `;
+                gallery.appendChild(card);
+              }
+            };
+            img.onerror = () => console.log("Image not found:", url);
+          }
+        });
       });
     }
   </script>
