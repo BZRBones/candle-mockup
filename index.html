@@ -91,7 +91,6 @@
           document.getElementById("labelInput").value = publicId;
           console.log("Uploaded label:", publicId);
 
-          // Preload the real label image from secure_url
           fetch(secureUrl)
             .then(() => {
               console.log("✅ Label processed and fetched.");
@@ -107,6 +106,7 @@
 
     function generateGallery() {
       const labelId = document.getElementById("labelInput").value.trim();
+      const encodedLabelId = encodeURIComponent(labelId);
       const width = document.getElementById("widthInput").value || 600;
       const y = document.getElementById("yInput").value || 40;
       const gallery = document.getElementById("previewGallery");
@@ -117,14 +117,14 @@
       }
 
       gallery.innerHTML = "";
-      console.log("Generating mockups with label:", labelId);
+      console.log("Generating mockups with label:", encodedLabelId);
 
       baseImages.forEach((baseId) => {
         const formats = [".png", ".jpg", ".jpeg", ""];
         let found = false;
         formats.forEach(ext => {
           if (!found) {
-            const url = `https://res.cloudinary.com/${cloudName}/image/upload/l_${labelId},w_${width},x_0,y_${y}/${baseId}${ext}`;
+            const url = `https://res.cloudinary.com/${cloudName}/image/upload/l_${encodedLabelId},w_${width},x_0,y_${y}/${baseId}${ext}`;
             const img = new Image();
             img.src = url;
             img.onload = () => {
