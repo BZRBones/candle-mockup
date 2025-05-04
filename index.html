@@ -86,23 +86,21 @@
         folder: "labels"
       }, (error, result) => {
         if (!error && result && result.event === "success") {
-          const fullId = result.info.public_id;
-          const shortId = fullId.split('/').pop();
-          document.getElementById("labelInput").value = shortId;
-          console.log("Uploaded label:", shortId);
+          const secureUrl = result.info.secure_url;
+          const publicId = result.info.public_id.split('/').pop();
+          document.getElementById("labelInput").value = publicId;
+          console.log("Uploaded label:", publicId);
 
-          // Preload label to ensure it's available for overlays
-          const labelTestUrl = `https://res.cloudinary.com/${cloudName}/image/upload/${shortId}.png`;
-          const testImg = new Image();
-          testImg.onload = () => {
-            console.log("✅ Label is ready:", labelTestUrl);
-            generateGallery();
-          };
-          testImg.onerror = () => {
-            console.log("❌ Label not ready yet. Retrying in 2s...");
-            setTimeout(() => generateGallery(), 2000);
-          };
-          testImg.src = labelTestUrl;
+          // Preload the real label image from secure_url
+          fetch(secureUrl)
+            .then(() => {
+              console.log("✅ Label processed and fetched.");
+              generateGallery();
+            })
+            .catch(() => {
+              console.log("❌ Label not ready yet. Retrying in 2s...");
+              setTimeout(() => generateGallery(), 2000);
+            });
         }
       });
     }
