@@ -87,17 +87,21 @@
       }, (error, result) => {
         if (!error && result && result.event === "success") {
           const secureUrl = result.info.secure_url;
-          const publicId = result.info.public_id.split('/').pop();
-          document.getElementById("labelInput").value = publicId;
-          console.log("Uploaded label:", publicId);
+          const fullPublicId = result.info.public_id;
+          const shortId = fullPublicId.split('/').pop();
+          const encodedShortId = encodeURIComponent(shortId);
+          document.getElementById("labelInput").value = shortId;
 
-          fetch(secureUrl)
+          // Force process via fetch transformation trick
+          const triggerUrl = `https://res.cloudinary.com/${cloudName}/image/upload/l_fetch:${btoa(secureUrl)}/blank.png`;
+
+          fetch(triggerUrl)
             .then(() => {
-              console.log("✅ Label processed and fetched.");
+              console.log("✅ Overlay fetch triggered.");
               generateGallery();
             })
             .catch(() => {
-              console.log("❌ Label not ready yet. Retrying in 2s...");
+              console.log("❌ Failed to trigger overlay fetch. Retrying in 2s...");
               setTimeout(() => generateGallery(), 2000);
             });
         }
