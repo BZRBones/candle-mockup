@@ -57,9 +57,6 @@
   <p>Optional: Adjust label width (default 600):</p>
   <input type="text" id="widthInput" placeholder="600" />
 
-  <p>Optional: Adjust label Y position (default 40):</p>
-  <input type="text" id="yInput" placeholder="40" />
-
   <br />
   <button onclick="generateGallery()">Generate Mockups</button>
 
@@ -86,24 +83,10 @@
         folder: "labels"
       }, (error, result) => {
         if (!error && result && result.event === "success") {
-          const secureUrl = result.info.secure_url;
           const fullPublicId = result.info.public_id;
           const shortId = fullPublicId.split('/').pop();
-          const encodedShortId = encodeURIComponent(shortId);
           document.getElementById("labelInput").value = shortId;
-
-          // Force process via fetch transformation trick
-          const triggerUrl = `https://res.cloudinary.com/${cloudName}/image/upload/l_fetch:${btoa(secureUrl)}/blank.png`;
-
-          fetch(triggerUrl)
-            .then(() => {
-              console.log("✅ Overlay fetch triggered.");
-              generateGallery();
-            })
-            .catch(() => {
-              console.log("❌ Failed to trigger overlay fetch. Retrying in 2s...");
-              setTimeout(() => generateGallery(), 2000);
-            });
+          generateGallery();
         }
       });
     }
@@ -112,7 +95,6 @@
       const labelId = document.getElementById("labelInput").value.trim();
       const encodedLabelId = encodeURIComponent(labelId);
       const width = document.getElementById("widthInput").value || 600;
-      const y = document.getElementById("yInput").value || 40;
       const gallery = document.getElementById("previewGallery");
 
       if (!labelId) {
@@ -128,7 +110,10 @@
         let found = false;
         formats.forEach(ext => {
           if (!found) {
-            const url = `https://res.cloudinary.com/${cloudName}/image/upload/l_${encodedLabelId},w_${width},x_0,y_${y}/${baseId}${ext}`;
+            const labelLayer = `l_${encodedLabelId},w_${width}`;
+            const warpOverlay = `l_warped-label-overlay/fl_layer_apply`;
+            const url = `https://res.cloudinary.com/${cloudName}/image/upload/${labelLayer}/${warpOverlay}/${baseId}${ext}`;
+
             const img = new Image();
             img.src = url;
             img.onload = () => {
